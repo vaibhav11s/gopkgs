@@ -163,6 +163,7 @@ func TestEqual(t *testing.T) {
 		{Vector2D{2, 2}, Vector2D{2, 2}, []interface{}{0}, true, false},
 		{Vector2D{3, 2}, Vector2D{3, 2}, []interface{}{"0"}, false, true},
 		{Vector2D{3, 2}, Vector2D{2, 2}, []interface{}{}, false, false},
+		{Vector2D{3, 2}, Vector2D{3, 3}, []interface{}{}, false, false},
 		{Vector2D{3, 2}, Vector2D{2, 2}, []interface{}{1}, true, false},
 		{Vector2D{3, 2}, Vector2D{2, 2}, []interface{}{1, 1}, false, true},
 	}
@@ -180,6 +181,22 @@ func TestEqual(t *testing.T) {
 			t.Errorf("Equal(%v, %v) returned %v, want %v", test.v1, test.v2, equal, test.equal)
 			continue
 		}
+	}
+	v1 := Vector2D{1, 2}
+	v2 := Vector2D{1, 2}
+	V1 := &v1
+	V2 := &v2
+	if i, _ := v1.Equal(v2); !i {
+		t.Errorf("Equal(%v, %v) returned %v, want %v", v1, v2, i, true)
+	}
+	if i, _ := v1.Equal(*V2); !i {
+		t.Errorf("Equal(%v, %v) returned %v, want %v", v1, V2, i, true)
+	}
+	if i, _ := V1.Equal(v2); !i {
+		t.Errorf("Equal(%v, %v) returned %v, want %v", V1, v2, i, true)
+	}
+	if i, _ := V1.Equal(*V2); !i {
+		t.Errorf("Equal(%v, %v) returned %v, want %v", V1, V2, i, true)
 	}
 }
 
@@ -697,6 +714,13 @@ func testAngleBetween(t *testing.T, angleB func(v1, v2 Vector2D) (float32, error
 func TestVecAngleBetween(t *testing.T) {
 	angleB := func(v1, v2 Vector2D) (float32, error) {
 		return v1.AngleBetween(v2)
+	}
+	testAngleBetween(t, angleB)
+}
+
+func TestAngleBetweenVec(t *testing.T) {
+	angleB := func(v1, v2 Vector2D) (float32, error) {
+		return AngleBetween(v1, v2)
 	}
 	testAngleBetween(t, angleB)
 }

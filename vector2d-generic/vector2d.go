@@ -100,7 +100,7 @@ func (v Vector2D) String() string {
 // Checks whether two vectors are equal.
 // optional tolerence value can be passed as a parameter to check for equality
 // within a tolerance, abs(v.x - v2.x) < tolerance and abs(v.y - v2.y) < tolerance
-func (v Vector2D) Equal(v2 Vector2D, tolerance ...interface{}) (bool, error) {
+func (v *Vector2D) Equal(v2 Vector2D, tolerance ...interface{}) (bool, error) {
 	if len(tolerance) > 1 {
 		return false, fmt.Errorf("too many arguments")
 	}
@@ -112,8 +112,13 @@ func (v Vector2D) Equal(v2 Vector2D, tolerance ...interface{}) (bool, error) {
 			return false, err
 		}
 	}
-	opt := getComparer(float64(t))
-	return cmp.Equal(v, v2, opt), nil
+	if math.Abs(float64(v.X-v2.X)) > float64(t) {
+		return false, nil
+	}
+	if math.Abs(float64(v.Y-v2.Y)) > float64(t) {
+		return false, nil
+	}
+	return true, nil
 }
 
 // Gets a copy of the vector

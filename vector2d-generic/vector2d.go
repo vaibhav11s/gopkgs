@@ -164,17 +164,15 @@ func (v *Vector2D) Resize(len interface{}) error {
 }
 
 // add a vector to the current vector
-func (v *Vector2D) Add(v2 Vector2D) error {
+func (v *Vector2D) Add(v2 Vector2D) {
 	v.X += v2.X
 	v.Y += v2.Y
-	return nil
 }
 
 // subtract a vector from the current vector
-func (v *Vector2D) Sub(v2 Vector2D) error {
+func (v *Vector2D) Sub(v2 Vector2D) {
 	v.X -= v2.X
 	v.Y -= v2.Y
-	return nil
 }
 
 // Multiplies the vector by a scalar

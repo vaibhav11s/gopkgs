@@ -7,8 +7,6 @@ import (
 	"math/rand"
 	"reflect"
 	"time"
-
-	"github.com/google/go-cmp/cmp"
 )
 
 type Vector2D struct {
@@ -25,13 +23,6 @@ func getFloat(unk interface{}) (float32, error) {
 	}
 	fv := v.Convert(floatType)
 	return float32(fv.Float()), nil
-}
-
-func getComparer(tolerance float64) cmp.Option {
-	return cmp.Comparer(func(x, y float32) bool {
-		diff := math.Abs(float64(x - y))
-		return diff <= tolerance
-	})
 }
 
 func init() {

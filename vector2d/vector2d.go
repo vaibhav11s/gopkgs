@@ -6,19 +6,10 @@ import (
 	"math"
 	"math/rand"
 	"time"
-
-	"github.com/google/go-cmp/cmp"
 )
 
 type Vector2D struct {
 	X, Y float32
-}
-
-func getComparer(tolerance float64) cmp.Option {
-	return cmp.Comparer(func(x, y float32) bool {
-		diff := math.Abs(float64(x - y))
-		return diff <= tolerance
-	})
 }
 
 func init() {

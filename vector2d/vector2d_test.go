@@ -8,6 +8,13 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
+func getComparer(tolerance float64) cmp.Option {
+	return cmp.Comparer(func(x, y float32) bool {
+		diff := math.Abs(float64(x - y))
+		return diff <= tolerance
+	})
+}
+
 func testNewVector(t *testing.T, new func(a float32, b float32) Vector2D) {
 	var tests []struct {
 		a, b float32

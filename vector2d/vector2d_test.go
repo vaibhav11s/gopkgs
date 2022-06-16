@@ -15,10 +15,10 @@ func getComparer(tolerance float64) cmp.Option {
 	})
 }
 
-func testNewVector(t *testing.T, new func(a float32, b float32) Vector2D) {
+func testNewVector(t *testing.T, new func(a float32, b float32) *Vector2D) {
 	var tests []struct {
 		a, b float32
-		v    Vector2D
+		v    *Vector2D
 	}
 	for i := 0; i < 10; i++ {
 		a := rand.Float32()*100 - 50
@@ -26,20 +26,16 @@ func testNewVector(t *testing.T, new func(a float32, b float32) Vector2D) {
 		v := new(a, b)
 		tests = append(tests, struct {
 			a, b float32
-			v    Vector2D
+			v    *Vector2D
 		}{a, b, v})
 	}
 	for _, test := range tests {
 		v := new(test.a, test.b)
-		if v != test.v {
+		if *v != *test.v {
 			t.Errorf("New(%f, %f) = %v, want %v", test.a, test.b, v, test.v)
 			continue
 		}
 	}
-}
-
-func Test_vector(t *testing.T) {
-	testNewVector(t, vector2d)
 }
 
 func TestNew(t *testing.T) {
@@ -49,14 +45,14 @@ func TestNew(t *testing.T) {
 func TestFromAngle(t *testing.T) {
 	tests := []struct {
 		params []float32
-		v      Vector2D
+		v      *Vector2D
 	}{
-		{[]float32{0}, Vector2D{1, 0}},
-		{[]float32{math.Pi}, Vector2D{-1, 0}},
-		{[]float32{math.Pi / 2}, Vector2D{0, 1}},
-		{[]float32{math.Pi / 4}, Vector2D{math.Sqrt2 / 2, math.Sqrt2 / 2}},
-		{[]float32{math.Pi / 4, 2}, Vector2D{math.Sqrt2, math.Sqrt2}},
-		{[]float32{math.Pi / 4, 2, 3}, Vector2D{math.Sqrt2, math.Sqrt2}},
+		{[]float32{0}, &Vector2D{1, 0}},
+		{[]float32{math.Pi}, &Vector2D{-1, 0}},
+		{[]float32{math.Pi / 2}, &Vector2D{0, 1}},
+		{[]float32{math.Pi / 4}, &Vector2D{math.Sqrt2 / 2, math.Sqrt2 / 2}},
+		{[]float32{math.Pi / 4, 2}, &Vector2D{math.Sqrt2, math.Sqrt2}},
+		{[]float32{math.Pi / 4, 2, 3}, &Vector2D{math.Sqrt2, math.Sqrt2}},
 	}
 	for _, test := range tests {
 		v := FromAngle(test.params[0], test.params[1:]...)
@@ -66,7 +62,7 @@ func TestFromAngle(t *testing.T) {
 	}
 }
 
-func checkMagErr(t *testing.T, v Vector2D, mag float32) {
+func checkMagErr(t *testing.T, v *Vector2D, mag float32) {
 	opt := getComparer(.00001)
 	Mag := v.Mag()
 	if !cmp.Equal(Mag, mag, opt) {
@@ -124,17 +120,17 @@ func TestString(t *testing.T) {
 
 func TestEqual(t *testing.T) {
 	tests := []struct {
-		v1, v2    Vector2D
+		v1, v2    *Vector2D
 		tolerance []float32
 		equal     bool
 	}{
-		{Vector2D{1, 2}, Vector2D{1, 2}, []float32{}, true},
-		{Vector2D{2, 2}, Vector2D{2, 2}, []float32{0}, true},
-		{Vector2D{3, 2}, Vector2D{2, 2}, []float32{}, false},
-		{Vector2D{3, 2}, Vector2D{3, 3}, []float32{}, false},
-		{Vector2D{3, 2}, Vector2D{2, 2}, []float32{1}, true},
-		{Vector2D{3, 2}, Vector2D{2, 2}, []float32{1, 1}, true},
-		{Vector2D{3, 2}, Vector2D{2, 2}, []float32{0, 1}, false},
+		{&Vector2D{1, 2}, &Vector2D{1, 2}, []float32{}, true},
+		{&Vector2D{2, 2}, &Vector2D{2, 2}, []float32{0}, true},
+		{&Vector2D{3, 2}, &Vector2D{2, 2}, []float32{}, false},
+		{&Vector2D{3, 2}, &Vector2D{3, 3}, []float32{}, false},
+		{&Vector2D{3, 2}, &Vector2D{2, 2}, []float32{1}, true},
+		{&Vector2D{3, 2}, &Vector2D{2, 2}, []float32{1, 1}, true},
+		{&Vector2D{3, 2}, &Vector2D{2, 2}, []float32{0, 1}, false},
 	}
 	for _, test := range tests {
 		equal := test.v1.Equal(test.v2, test.tolerance...)
@@ -147,17 +143,17 @@ func TestEqual(t *testing.T) {
 	v2 := Vector2D{1, 2}
 	V1 := &v1
 	V2 := &v2
-	if !v1.Equal(v2) {
-		t.Errorf("Equal(%v, %v) returned %v, want %v", v1, v2, v1.Equal(v2), true)
+	if !v1.Equal(&v2) {
+		t.Errorf("Equal(%v, %v) returned %v, want %v", v1, v2, v1.Equal(&v2), true)
 	}
-	if !v1.Equal(*V2) {
-		t.Errorf("Equal(%v, *&%v) returned %v, want %v", v1, V2, v1.Equal(*V2), true)
+	if !v1.Equal(V2) {
+		t.Errorf("Equal(%v, *&%v) returned %v, want %v", v1, V2, v1.Equal(V2), true)
 	}
-	if !V1.Equal(v2) {
-		t.Errorf("Equal(&%v, %v) returned %v, want %v", V1, v2, V1.Equal(v2), true)
+	if !V1.Equal(&v2) {
+		t.Errorf("Equal(&%v, %v) returned %v, want %v", V1, v2, V1.Equal(&v2), true)
 	}
-	if !V1.Equal(*V2) {
-		t.Errorf("Equal(&%v, *&%v) returned %v, want %v", V1, V2, V1.Equal(*V2), true)
+	if !V1.Equal(V2) {
+		t.Errorf("Equal(&%v, *&%v) returned %v, want %v", V1, V2, V1.Equal(V2), true)
 	}
 }
 
@@ -172,15 +168,15 @@ func testVecCopy(t *testing.T, copy func(*Vector2D) *Vector2D) {
 	}
 	for _, test := range tests {
 		v := copy(test.v)
-		if !v.Equal(*test.v) {
+		if !v.Equal(test.v) {
 			t.Errorf("Copy(%v) returned %v, want %v", test.v, v, test.v)
 		}
 		v.X = 32
-		if v.Equal(*test.v) {
+		if v.Equal(test.v) {
 			t.Errorf("Changing values of Copy(%v) did change original", test.v)
 		}
 		test.v.X = 21
-		if v.Equal(*test.v) {
+		if v.Equal(test.v) {
 			t.Errorf("Changing values of original did change Copy(%v)", test.v)
 		}
 
@@ -190,33 +186,33 @@ func testVecCopy(t *testing.T, copy func(*Vector2D) *Vector2D) {
 func TestVecCopy(t *testing.T) {
 	copy := func(v *Vector2D) *Vector2D {
 		v1 := v.Copy()
-		return &v1
+		return v1
 	}
 	testVecCopy(t, copy)
 }
 
 func TestCopyVec(t *testing.T) {
 	copy := func(v *Vector2D) *Vector2D {
-		v1 := Copy(*v)
-		return &v1
+		v1 := Copy(v)
+		return v1
 	}
 	testVecCopy(t, copy)
 }
 
 func TestMagnitude(t *testing.T) {
 	tests := []struct {
-		v    Vector2D
+		v    *Vector2D
 		magn float32
 	}{
-		{Vector2D{1, 0}, 1},
-		{Vector2D{-1, 0}, 1},
-		{Vector2D{0, 1}, 1},
-		{Vector2D{0, -1}, 1},
-		{Vector2D{1, 1}, math.Sqrt2},
-		{Vector2D{0, 0}, 0},
-		{Vector2D{3, 4}, 5},
-		{Vector2D{-3, 4}, 5},
-		{Vector2D{0.6, 0.8}, 1},
+		{&Vector2D{1, 0}, 1},
+		{&Vector2D{-1, 0}, 1},
+		{&Vector2D{0, 1}, 1},
+		{&Vector2D{0, -1}, 1},
+		{&Vector2D{1, 1}, math.Sqrt2},
+		{&Vector2D{0, 0}, 0},
+		{&Vector2D{3, 4}, 5},
+		{&Vector2D{-3, 4}, 5},
+		{&Vector2D{0.6, 0.8}, 1},
 	}
 	opt := getComparer(.00001)
 	for _, test := range tests {
@@ -230,16 +226,16 @@ func TestMagnitude(t *testing.T) {
 
 func TestMagnitudeSqr(t *testing.T) {
 	tests := []struct {
-		v    Vector2D
+		v    *Vector2D
 		magn float32
 	}{
-		{Vector2D{1, 0}, 1},
-		{Vector2D{-1, 0}, 1},
-		{Vector2D{0, 1}, 1},
-		{Vector2D{0, -1}, 1},
-		{Vector2D{1, 1}, 2},
-		{Vector2D{0, 0}, 0},
-		{Vector2D{3, 4}, 25},
+		{&Vector2D{1, 0}, 1},
+		{&Vector2D{-1, 0}, 1},
+		{&Vector2D{0, 1}, 1},
+		{&Vector2D{0, -1}, 1},
+		{&Vector2D{1, 1}, 2},
+		{&Vector2D{0, 0}, 0},
+		{&Vector2D{3, 4}, 25},
 	}
 	opt := getComparer(.00001)
 	for _, test := range tests {
@@ -253,16 +249,16 @@ func TestMagnitudeSqr(t *testing.T) {
 
 func TestHeading(t *testing.T) {
 	tests := []struct {
-		v     Vector2D
+		v     *Vector2D
 		angle float32
 	}{
-		{Vector2D{1, 0}, 0},
-		{Vector2D{-1, 0}, math.Pi},
-		{Vector2D{0, 1}, math.Pi / 2},
-		{Vector2D{0, -1}, -math.Pi / 2},
-		{Vector2D{1, 1}, math.Pi / 4},
-		{Vector2D{0, 0}, 0},
-		{Vector2D{3, 4}, float32(math.Atan2(4, 3))},
+		{&Vector2D{1, 0}, 0},
+		{&Vector2D{-1, 0}, math.Pi},
+		{&Vector2D{0, 1}, math.Pi / 2},
+		{&Vector2D{0, -1}, -math.Pi / 2},
+		{&Vector2D{1, 1}, math.Pi / 4},
+		{&Vector2D{0, 0}, 0},
+		{&Vector2D{3, 4}, float32(math.Atan2(4, 3))},
 	}
 	opt := getComparer(.00001)
 	for _, test := range tests {
@@ -276,15 +272,15 @@ func TestHeading(t *testing.T) {
 
 func TestUnit(t *testing.T) {
 	tests := []struct {
-		v    Vector2D
-		norm Vector2D
+		v    *Vector2D
+		norm *Vector2D
 	}{
-		{Vector2D{1, 0}, Vector2D{1, 0}},
-		{Vector2D{-1, 0}, Vector2D{-1, 0}},
-		{Vector2D{0, 2}, Vector2D{0, 1}},
-		{Vector2D{0, -2}, Vector2D{0, -1}},
-		{Vector2D{1, 1}, Vector2D{1 / math.Sqrt2, 1 / math.Sqrt2}},
-		{Vector2D{0, 0}, Vector2D{0, 0}},
+		{&Vector2D{1, 0}, &Vector2D{1, 0}},
+		{&Vector2D{-1, 0}, &Vector2D{-1, 0}},
+		{&Vector2D{0, 2}, &Vector2D{0, 1}},
+		{&Vector2D{0, -2}, &Vector2D{0, -1}},
+		{&Vector2D{1, 1}, &Vector2D{1 / math.Sqrt2, 1 / math.Sqrt2}},
+		{&Vector2D{0, 0}, &Vector2D{0, 0}},
 	}
 	for _, test := range tests {
 		v := Unit(test.v)
@@ -297,16 +293,16 @@ func TestUnit(t *testing.T) {
 
 func TestNormalize(t *testing.T) {
 	tests := []struct {
-		v    Vector2D
-		norm Vector2D
+		v    *Vector2D
+		norm *Vector2D
 	}{
-		{Vector2D{1, 0}, Vector2D{1, 0}},
-		{Vector2D{-1, 0}, Vector2D{-1, 0}},
-		{Vector2D{0, 2}, Vector2D{0, 1}},
-		{Vector2D{0, -2}, Vector2D{0, -1}},
-		{Vector2D{1, 1}, Vector2D{1 / math.Sqrt2, 1 / math.Sqrt2}},
-		{Vector2D{0, 0}, Vector2D{0, 0}},
-		{Vector2D{3, 4}, Vector2D{3.0 / 5, 4.0 / 5}},
+		{&Vector2D{1, 0}, &Vector2D{1, 0}},
+		{&Vector2D{-1, 0}, &Vector2D{-1, 0}},
+		{&Vector2D{0, 2}, &Vector2D{0, 1}},
+		{&Vector2D{0, -2}, &Vector2D{0, -1}},
+		{&Vector2D{1, 1}, &Vector2D{1 / math.Sqrt2, 1 / math.Sqrt2}},
+		{&Vector2D{0, 0}, &Vector2D{0, 0}},
+		{&Vector2D{3, 4}, &Vector2D{3.0 / 5, 4.0 / 5}},
 	}
 	for _, test := range tests {
 		test.v.Normalize()
@@ -319,14 +315,14 @@ func TestNormalize(t *testing.T) {
 
 func TestResize(t *testing.T) {
 	tests := []struct {
-		v Vector2D
+		v *Vector2D
 		m float32
-		s Vector2D
+		s *Vector2D
 	}{
-		{Vector2D{0, 0}, 2, Vector2D{0, 0}},
-		{Vector2D{1, 0}, 2, Vector2D{2, 0}},
-		{Vector2D{-1, 0}, 2, Vector2D{-2, 0}},
-		{Vector2D{3, 4}, 10, Vector2D{6, 8}},
+		{&Vector2D{0, 0}, 2, &Vector2D{0, 0}},
+		{&Vector2D{1, 0}, 2, &Vector2D{2, 0}},
+		{&Vector2D{-1, 0}, 2, &Vector2D{-2, 0}},
+		{&Vector2D{3, 4}, 10, &Vector2D{6, 8}},
 	}
 	for _, test := range tests {
 		test.v.Resize(test.m)
@@ -339,15 +335,15 @@ func TestResize(t *testing.T) {
 
 func TestVecAdd(t *testing.T) {
 	tests := []struct {
-		v1 Vector2D
-		v2 Vector2D
-		v3 Vector2D
+		v1 *Vector2D
+		v2 *Vector2D
+		v3 *Vector2D
 	}{
-		{Vector2D{1, 1}, Vector2D{1, 1}, Vector2D{2, 2}},
-		{Vector2D{1, 1}, Vector2D{-1, -1}, Vector2D{0, 0}},
-		{Vector2D{1, 1}, Vector2D{0, 0}, Vector2D{1, 1}},
-		{Vector2D{1, 1}, Vector2D{1, 0}, Vector2D{2, 1}},
-		{Vector2D{1, 1}, Vector2D{0, 1}, Vector2D{1, 2}},
+		{&Vector2D{1, 1}, &Vector2D{1, 1}, &Vector2D{2, 2}},
+		{&Vector2D{1, 1}, &Vector2D{-1, -1}, &Vector2D{0, 0}},
+		{&Vector2D{1, 1}, &Vector2D{0, 0}, &Vector2D{1, 1}},
+		{&Vector2D{1, 1}, &Vector2D{1, 0}, &Vector2D{2, 1}},
+		{&Vector2D{1, 1}, &Vector2D{0, 1}, &Vector2D{1, 2}},
 	}
 	for _, test := range tests {
 		v1 := test.v1.Copy()
@@ -368,15 +364,15 @@ func TestVecAdd(t *testing.T) {
 func TestAddVec(t *testing.T) {
 	opt := getComparer(.00001)
 	tests := []struct {
-		v1 Vector2D
-		v2 Vector2D
-		v3 Vector2D
+		v1 *Vector2D
+		v2 *Vector2D
+		v3 *Vector2D
 	}{
-		{Vector2D{1, 1}, Vector2D{1, 1}, Vector2D{2, 2}},
-		{Vector2D{1, 1}, Vector2D{-1, -1}, Vector2D{0, 0}},
-		{Vector2D{1, 1}, Vector2D{0, 0}, Vector2D{1, 1}},
-		{Vector2D{1, 1}, Vector2D{1, 0}, Vector2D{2, 1}},
-		{Vector2D{1, 1}, Vector2D{0, 1}, Vector2D{1, 2}},
+		{&Vector2D{1, 1}, &Vector2D{1, 1}, &Vector2D{2, 2}},
+		{&Vector2D{1, 1}, &Vector2D{-1, -1}, &Vector2D{0, 0}},
+		{&Vector2D{1, 1}, &Vector2D{0, 0}, &Vector2D{1, 1}},
+		{&Vector2D{1, 1}, &Vector2D{1, 0}, &Vector2D{2, 1}},
+		{&Vector2D{1, 1}, &Vector2D{0, 1}, &Vector2D{1, 2}},
 	}
 	for _, test := range tests {
 		v1 := test.v1.Copy()
@@ -399,15 +395,15 @@ func TestAddVec(t *testing.T) {
 
 func TestVecSub(t *testing.T) {
 	tests := []struct {
-		v1 Vector2D
-		v2 Vector2D
-		v3 Vector2D
+		v1 *Vector2D
+		v2 *Vector2D
+		v3 *Vector2D
 	}{
-		{Vector2D{1, 1}, Vector2D{1, 1}, Vector2D{0, 0}},
-		{Vector2D{1, 1}, Vector2D{-1, -1}, Vector2D{2, 2}},
-		{Vector2D{1, 1}, Vector2D{0, 0}, Vector2D{1, 1}},
-		{Vector2D{1, 1}, Vector2D{1, 0}, Vector2D{0, 1}},
-		{Vector2D{1, 1}, Vector2D{0, 1}, Vector2D{1, 0}},
+		{&Vector2D{1, 1}, &Vector2D{1, 1}, &Vector2D{0, 0}},
+		{&Vector2D{1, 1}, &Vector2D{-1, -1}, &Vector2D{2, 2}},
+		{&Vector2D{1, 1}, &Vector2D{0, 0}, &Vector2D{1, 1}},
+		{&Vector2D{1, 1}, &Vector2D{1, 0}, &Vector2D{0, 1}},
+		{&Vector2D{1, 1}, &Vector2D{0, 1}, &Vector2D{1, 0}},
 	}
 	for _, test := range tests {
 		v1 := test.v1.Copy()
@@ -426,15 +422,15 @@ func TestVecSub(t *testing.T) {
 
 func TestSubVec(t *testing.T) {
 	tests := []struct {
-		v1 Vector2D
-		v2 Vector2D
-		v3 Vector2D
+		v1 *Vector2D
+		v2 *Vector2D
+		v3 *Vector2D
 	}{
-		{Vector2D{1, 1}, Vector2D{1, 1}, Vector2D{0, 0}},
-		{Vector2D{1, 1}, Vector2D{-1, -1}, Vector2D{2, 2}},
-		{Vector2D{1, 1}, Vector2D{0, 0}, Vector2D{1, 1}},
-		{Vector2D{1, 1}, Vector2D{1, 0}, Vector2D{0, 1}},
-		{Vector2D{1, 1}, Vector2D{0, 1}, Vector2D{1, 0}},
+		{&Vector2D{1, 1}, &Vector2D{1, 1}, &Vector2D{0, 0}},
+		{&Vector2D{1, 1}, &Vector2D{-1, -1}, &Vector2D{2, 2}},
+		{&Vector2D{1, 1}, &Vector2D{0, 0}, &Vector2D{1, 1}},
+		{&Vector2D{1, 1}, &Vector2D{1, 0}, &Vector2D{0, 1}},
+		{&Vector2D{1, 1}, &Vector2D{0, 1}, &Vector2D{1, 0}},
 	}
 	for _, test := range tests {
 		v1 := test.v1.Copy()
@@ -457,15 +453,15 @@ func TestSubVec(t *testing.T) {
 
 func TestMult(t *testing.T) {
 	tests := []struct {
-		v Vector2D
+		v *Vector2D
 		m float32
-		s Vector2D
+		s *Vector2D
 	}{
-		{Vector2D{0, 0}, 2, Vector2D{0, 0}},
-		{Vector2D{1, 0}, 2, Vector2D{2, 0}},
-		{Vector2D{-1, 0}, 2, Vector2D{-2, 0}},
-		{Vector2D{1, 4}, 1.2, Vector2D{1.2, 4.8}},
-		{Vector2D{1, 4}, 0, Vector2D{0, 0}},
+		{&Vector2D{0, 0}, 2, &Vector2D{0, 0}},
+		{&Vector2D{1, 0}, 2, &Vector2D{2, 0}},
+		{&Vector2D{-1, 0}, 2, &Vector2D{-2, 0}},
+		{&Vector2D{1, 4}, 1.2, &Vector2D{1.2, 4.8}},
+		{&Vector2D{1, 4}, 0, &Vector2D{0, 0}},
 	}
 	for _, test := range tests {
 		test.v.Mult(test.m)
@@ -478,16 +474,16 @@ func TestMult(t *testing.T) {
 
 func TestRotate(t *testing.T) {
 	tests := []struct {
-		v Vector2D
+		v *Vector2D
 		r float32
-		s Vector2D
+		s *Vector2D
 	}{
-		{Vector2D{1, 0}, 0, Vector2D{1, 0}},
-		{Vector2D{1, 0}, math.Pi, Vector2D{-1, 0}},
-		{Vector2D{1, 0}, math.Pi / 2, Vector2D{0, 1}},
-		{Vector2D{1, 0}, -math.Pi / 2, Vector2D{0, -1}},
-		{Vector2D{1, 0}, math.Pi / 4, Vector2D{math.Sqrt2 / 2, math.Sqrt2 / 2}},
-		{Vector2D{1, 0}, -math.Pi / 4, Vector2D{math.Sqrt2 / 2, -math.Sqrt2 / 2}},
+		{&Vector2D{1, 0}, 0, &Vector2D{1, 0}},
+		{&Vector2D{1, 0}, math.Pi, &Vector2D{-1, 0}},
+		{&Vector2D{1, 0}, math.Pi / 2, &Vector2D{0, 1}},
+		{&Vector2D{1, 0}, -math.Pi / 2, &Vector2D{0, -1}},
+		{&Vector2D{1, 0}, math.Pi / 4, &Vector2D{math.Sqrt2 / 2, math.Sqrt2 / 2}},
+		{&Vector2D{1, 0}, -math.Pi / 4, &Vector2D{math.Sqrt2 / 2, -math.Sqrt2 / 2}},
 	}
 	for _, test := range tests {
 		v := test.v
@@ -500,16 +496,16 @@ func TestRotate(t *testing.T) {
 
 func TestSetHeading(t *testing.T) {
 	tests := []struct {
-		v Vector2D
+		v *Vector2D
 		h float32
-		s Vector2D
+		s *Vector2D
 	}{
-		{Vector2D{1, 0}, 0, Vector2D{1, 0}},
-		{Vector2D{1, 0}, math.Pi, Vector2D{-1, 0}},
-		{Vector2D{1, 0}, math.Pi / 2, Vector2D{0, 1}},
-		{Vector2D{1, 0}, -math.Pi / 2, Vector2D{0, -1}},
-		{Vector2D{1, 0}, math.Pi / 4, Vector2D{math.Sqrt2 / 2, math.Sqrt2 / 2}},
-		{Vector2D{1, 0}, -math.Pi / 4, Vector2D{math.Sqrt2 / 2, -math.Sqrt2 / 2}},
+		{&Vector2D{1, 0}, 0, &Vector2D{1, 0}},
+		{&Vector2D{1, 0}, math.Pi, &Vector2D{-1, 0}},
+		{&Vector2D{1, 0}, math.Pi / 2, &Vector2D{0, 1}},
+		{&Vector2D{1, 0}, -math.Pi / 2, &Vector2D{0, -1}},
+		{&Vector2D{1, 0}, math.Pi / 4, &Vector2D{math.Sqrt2 / 2, math.Sqrt2 / 2}},
+		{&Vector2D{1, 0}, -math.Pi / 4, &Vector2D{math.Sqrt2 / 2, -math.Sqrt2 / 2}},
 	}
 	for _, test := range tests {
 		v := test.v
@@ -522,15 +518,15 @@ func TestSetHeading(t *testing.T) {
 
 func TestDist(t *testing.T) {
 	tests := []struct {
-		v1, v2 Vector2D
+		v1, v2 *Vector2D
 		d      float32
 	}{
-		{Vector2D{0, 0}, Vector2D{0, 0}, 0},
-		{Vector2D{1, 0}, Vector2D{0, 0}, 1},
-		{Vector2D{0, 1}, Vector2D{0, 0}, 1},
-		{Vector2D{1, 1}, Vector2D{0, 0}, math.Sqrt2},
-		{Vector2D{3, 4}, Vector2D{4, 3}, math.Sqrt2},
-		{Vector2D{1, 0}, Vector2D{0, 1}, math.Sqrt2},
+		{&Vector2D{0, 0}, &Vector2D{0, 0}, 0},
+		{&Vector2D{1, 0}, &Vector2D{0, 0}, 1},
+		{&Vector2D{0, 1}, &Vector2D{0, 0}, 1},
+		{&Vector2D{1, 1}, &Vector2D{0, 0}, math.Sqrt2},
+		{&Vector2D{3, 4}, &Vector2D{4, 3}, math.Sqrt2},
+		{&Vector2D{1, 0}, &Vector2D{0, 1}, math.Sqrt2},
 	}
 	opt := getComparer(.00001)
 	for _, test := range tests {
@@ -541,15 +537,15 @@ func TestDist(t *testing.T) {
 	}
 }
 
-func testDot(t *testing.T, dot func(Vector2D, Vector2D) float32) {
+func testDot(t *testing.T, dot func(*Vector2D, *Vector2D) float32) {
 	tests := []struct {
-		v1, v2 Vector2D
+		v1, v2 *Vector2D
 		d      float32
 	}{
-		{Vector2D{0, 0}, Vector2D{0, 0}, 0},
-		{Vector2D{1, 0}, Vector2D{0, 0}, 0},
-		{Vector2D{0, 1}, Vector2D{1, 0}, 0},
-		{Vector2D{3, 4}, Vector2D{4, 3}, 24},
+		{&Vector2D{0, 0}, &Vector2D{0, 0}, 0},
+		{&Vector2D{1, 0}, &Vector2D{0, 0}, 0},
+		{&Vector2D{0, 1}, &Vector2D{1, 0}, 0},
+		{&Vector2D{3, 4}, &Vector2D{4, 3}, 24},
 	}
 	opt := getComparer(.00001)
 	for _, test := range tests {
@@ -561,27 +557,27 @@ func testDot(t *testing.T, dot func(Vector2D, Vector2D) float32) {
 }
 
 func TestVecDot(t *testing.T) {
-	dot := func(v1, v2 Vector2D) float32 {
+	dot := func(v1, v2 *Vector2D) float32 {
 		return v1.Dot(v2)
 	}
 	testDot(t, dot)
 }
 
 func TestDotVec(t *testing.T) {
-	dot := func(v1, v2 Vector2D) float32 {
+	dot := func(v1, v2 *Vector2D) float32 {
 		return Dot(v1, v2)
 	}
 	testDot(t, dot)
 }
 
-func testCross(t *testing.T, cross func(v1, v2 Vector2D) float32) {
+func testCross(t *testing.T, cross func(v1, v2 *Vector2D) float32) {
 	tests := []struct {
-		v1, v2 Vector2D
+		v1, v2 *Vector2D
 		d      float32
 	}{
-		{Vector2D{0, 0}, Vector2D{0, 0}, 0},
-		{Vector2D{1, 0}, Vector2D{0, 0}, 0},
-		{Vector2D{0, 1}, Vector2D{1, 0}, -1},
+		{&Vector2D{0, 0}, &Vector2D{0, 0}, 0},
+		{&Vector2D{1, 0}, &Vector2D{0, 0}, 0},
+		{&Vector2D{0, 1}, &Vector2D{1, 0}, -1},
 	}
 	opt := getComparer(.00001)
 	for _, test := range tests {
@@ -593,32 +589,32 @@ func testCross(t *testing.T, cross func(v1, v2 Vector2D) float32) {
 }
 
 func TestVecCross(t *testing.T) {
-	cross := func(v1, v2 Vector2D) float32 {
+	cross := func(v1, v2 *Vector2D) float32 {
 		return v1.Cross(v2)
 	}
 	testCross(t, cross)
 }
 
 func TestCrossVec(t *testing.T) {
-	cross := func(v1, v2 Vector2D) float32 {
+	cross := func(v1, v2 *Vector2D) float32 {
 		return Cross(v1, v2)
 	}
 	testCross(t, cross)
 }
 
-func testAngleBetween(t *testing.T, angleB func(v1, v2 Vector2D) float32) {
+func testAngleBetween(t *testing.T, angleB func(v1, v2 *Vector2D) float32) {
 	NaN := float32(math.NaN())
 	tests := []struct {
-		v1, v2 Vector2D
+		v1, v2 *Vector2D
 		a      float32
 	}{
-		{Vector2D{0, 0}, Vector2D{0, 0}, NaN},
-		{Vector2D{1, 0}, Vector2D{0, 0}, NaN},
-		{Vector2D{0, 0}, Vector2D{1, 1}, NaN},
-		{Vector2D{1, 0}, Vector2D{0, 1}, math.Pi / 2},
-		{Vector2D{0, 1}, Vector2D{1, 0}, -math.Pi / 2},
-		{Vector2D{0, 1}, Vector2D{0, 1}, 0},
-		{Vector2D{0, 2}, Vector2D{0, 12}, 0},
+		{&Vector2D{0, 0}, &Vector2D{0, 0}, NaN},
+		{&Vector2D{1, 0}, &Vector2D{0, 0}, NaN},
+		{&Vector2D{0, 0}, &Vector2D{1, 1}, NaN},
+		{&Vector2D{1, 0}, &Vector2D{0, 1}, math.Pi / 2},
+		{&Vector2D{0, 1}, &Vector2D{1, 0}, -math.Pi / 2},
+		{&Vector2D{0, 1}, &Vector2D{0, 1}, 0},
+		{&Vector2D{0, 2}, &Vector2D{0, 12}, 0},
 	}
 	opt := getComparer(.00001)
 	for _, test := range tests {
@@ -633,14 +629,14 @@ func testAngleBetween(t *testing.T, angleB func(v1, v2 Vector2D) float32) {
 }
 
 func TestVecAngleBetween(t *testing.T) {
-	angleB := func(v1, v2 Vector2D) float32 {
+	angleB := func(v1, v2 *Vector2D) float32 {
 		return v1.AngleBetween(v2)
 	}
 	testAngleBetween(t, angleB)
 }
 
 func TestAngleBetweenVec(t *testing.T) {
-	angleB := func(v1, v2 Vector2D) float32 {
+	angleB := func(v1, v2 *Vector2D) float32 {
 		return AngleBetween(v1, v2)
 	}
 	testAngleBetween(t, angleB)

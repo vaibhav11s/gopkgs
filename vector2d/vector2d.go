@@ -1,4 +1,4 @@
-// Package vector provides a simple 2D vector type on cartesian plane
+// Package vector2d provides a simple 2D vector type on cartesian plane
 package vector2d
 
 import (
@@ -75,7 +75,7 @@ func (v *Vector2D) Mag() float32 {
 }
 
 // Calculates the squared magnitude of the vector and returns the result as a float
-// this is simply the equation (x*x + y*y + z*z)
+// this is simply the equation (x*x + y*y)
 func (v *Vector2D) MagSq() float32 {
 	return v.X*v.X + v.Y*v.Y
 }

@@ -40,7 +40,7 @@ Package vector provides a simple 2D vector type on cartesian plane
   - [func Sub(v1, v2 Vector2D) Vector2D](#func-sub)
   - [func Unit(v Vector2D) Vector2D](#func-unit)
 
-# type Vector2D
+## type Vector2D
 
 ```go
 type Vector2D struct {
@@ -48,7 +48,7 @@ type Vector2D struct {
 }
 ```
 
-## func New
+### func New
 
 ```go
 func New(x, y interface{}) (Vector2D, error)
@@ -56,7 +56,7 @@ func New(x, y interface{}) (Vector2D, error)
 
 Creates a new 2D vector\. Two dimensional Euclidean vector\.
 
-## func FromAngle
+### func FromAngle
 
 ```go
 func FromAngle(angle interface{}, length ...interface{}) (Vector2D, error)
@@ -64,7 +64,7 @@ func FromAngle(angle interface{}, length ...interface{}) (Vector2D, error)
 
 Make a new 2D vector from an angle
 
-## func Random
+### func Random
 
 ```go
 func Random(length ...interface{}) (Vector2D, error)
@@ -72,7 +72,7 @@ func Random(length ...interface{}) (Vector2D, error)
 
 Make a new 2D vector from a random angle of length 1 \(default\) or a given length
 
-## func \(\*Vector2D\) Add
+### func \(\*Vector2D\) Add
 
 ```go
 func (v *Vector2D) Add(v2 Vector2D) error
@@ -80,7 +80,7 @@ func (v *Vector2D) Add(v2 Vector2D) error
 
 add a vector to the current vector
 
-## func Add
+### func Add
 
 ```go
 func Add(v1, v2 Vector2D) Vector2D
@@ -88,7 +88,7 @@ func Add(v1, v2 Vector2D) Vector2D
 
 returns the sum of two vectors
 
-## func \(Vector2D\) AngleBetween
+### func \(Vector2D\) AngleBetween
 
 ```go
 func (v Vector2D) AngleBetween(v2 Vector2D) (float32, error)
@@ -96,7 +96,7 @@ func (v Vector2D) AngleBetween(v2 Vector2D) (float32, error)
 
 Calculates and returns the angle with another vector Return error if the vectors any vector is zero vector
 
-## func AngleBetween
+### func AngleBetween
 
 ```go
 func AngleBetween(v1, v2 Vector2D) (float32, error)
@@ -104,7 +104,7 @@ func AngleBetween(v1, v2 Vector2D) (float32, error)
 
 Calculates and returns the angle between two vectors\. Return error if the vectors any vector is zero vector
 
-## func \(Vector2D\) Copy
+### func \(Vector2D\) Copy
 
 ```go
 func (v Vector2D) Copy() Vector2D
@@ -112,7 +112,7 @@ func (v Vector2D) Copy() Vector2D
 
 Gets a copy of the vector
 
-## func Copy
+### func Copy
 
 ```go
 func Copy(v Vector2D) Vector2D
@@ -120,7 +120,7 @@ func Copy(v Vector2D) Vector2D
 
 Gets a copy of the vector
 
-## func \(Vector2D\) Cross
+### func \(Vector2D\) Cross
 
 ```go
 func (v Vector2D) Cross(v2 Vector2D) float32
@@ -128,7 +128,7 @@ func (v Vector2D) Cross(v2 Vector2D) float32
 
 Calculates the cross product with another vector \~ give the value of the z axis component \(in 2D space\, the cross product is a vector perpendicular to the two input vectors\)
 
-## func Cross
+### func Cross
 
 ```go
 func Cross(v1, v2 Vector2D) float32
@@ -136,7 +136,7 @@ func Cross(v1, v2 Vector2D) float32
 
 Calculates the cross product of two vectors \~ give the value of the z axis component \(in 2D space\, the cross product is a vector perpendicular to the two input vectors\)
 
-## func \(Vector2D\) Dist
+### func \(Vector2D\) Dist
 
 ```go
 func (v Vector2D) Dist(v2 Vector2D) float32
@@ -144,7 +144,7 @@ func (v Vector2D) Dist(v2 Vector2D) float32
 
 Calculates the Euclidean distance between two points \(considering a point as a vector object\)
 
-## func \(\*Vector2D\) Div
+### func \(\*Vector2D\) Div
 
 ```go
 func (v *Vector2D) Div(scalar interface{}) error
@@ -152,7 +152,7 @@ func (v *Vector2D) Div(scalar interface{}) error
 
 Divides the vector by a scalar
 
-## func \(Vector2D\) Dot
+### func \(Vector2D\) Dot
 
 ```go
 func (v Vector2D) Dot(v2 Vector2D) float32
@@ -160,7 +160,7 @@ func (v Vector2D) Dot(v2 Vector2D) float32
 
 Calculates the dot product with another vector
 
-## func Dot
+### func Dot
 
 ```go
 func Dot(v1, v2 Vector2D) float32
@@ -168,7 +168,7 @@ func Dot(v1, v2 Vector2D) float32
 
 Calculates the dot product of two vectors
 
-## func \(Vector2D\) Equal
+### func \(Vector2D\) Equal
 
 ```go
 func (v Vector2D) Equal(v2 Vector2D, tolerance ...interface{}) (bool, error)
@@ -176,7 +176,7 @@ func (v Vector2D) Equal(v2 Vector2D, tolerance ...interface{}) (bool, error)
 
 Checks whether two vectors are equal\. optional tolerence value can be passed as a parameter to check for equality within a tolerance\, abs\(v\.x \- v2\.x\) \< tolerance and abs\(v\.y \- v2\.y\) \< tolerance
 
-## func \(Vector2D\) Heading
+### func \(Vector2D\) Heading
 
 ```go
 func (v Vector2D) Heading() float32
@@ -184,7 +184,7 @@ func (v Vector2D) Heading() float32
 
 Calculate the angle of rotation for the vector
 
-## func \(Vector2D\) Mag
+### func \(Vector2D\) Mag
 
 ```go
 func (v Vector2D) Mag() float32
@@ -192,7 +192,7 @@ func (v Vector2D) Mag() float32
 
 Calculates the magnitude \(length\) of the vector and returns the result as a float this is simply the equation sqrt\(x\*x \+ y\*y\)
 
-## func \(Vector2D\) MagSq
+### func \(Vector2D\) MagSq
 
 ```go
 func (v Vector2D) MagSq() float32
@@ -200,7 +200,7 @@ func (v Vector2D) MagSq() float32
 
 Calculates the squared magnitude of the vector and returns the result as a float this is simply the equation \(x\*x \+ y\*y \+ z\*z\)
 
-## func \(\*Vector2D\) Mult
+### func \(\*Vector2D\) Mult
 
 ```go
 func (v *Vector2D) Mult(scalar interface{}) error
@@ -208,7 +208,7 @@ func (v *Vector2D) Mult(scalar interface{}) error
 
 Multiplies the vector by a scalar
 
-## func \(\*Vector2D\) Normalize
+### func \(\*Vector2D\) Normalize
 
 ```go
 func (v *Vector2D) Normalize()
@@ -216,7 +216,7 @@ func (v *Vector2D) Normalize()
 
 Normalize the vector to length 1 \(make it a unit vector\)
 
-## func \(\*Vector2D\) Resize
+### func \(\*Vector2D\) Resize
 
 ```go
 func (v *Vector2D) Resize(len interface{}) error
@@ -224,7 +224,7 @@ func (v *Vector2D) Resize(len interface{}) error
 
 Set the length of this vector to the value used for the len parameter
 
-## func \(\*Vector2D\) Rotate
+### func \(\*Vector2D\) Rotate
 
 ```go
 func (v *Vector2D) Rotate(angle interface{}) error
@@ -232,7 +232,7 @@ func (v *Vector2D) Rotate(angle interface{}) error
 
 rotate the vector in the direction of the angle
 
-## func \(\*Vector2D\) SetHeading
+### func \(\*Vector2D\) SetHeading
 
 ```go
 func (v *Vector2D) SetHeading(angle interface{}) error
@@ -240,7 +240,7 @@ func (v *Vector2D) SetHeading(angle interface{}) error
 
 Rotate the vector to a specific angle\, magnitude remains the same
 
-## func \(Vector2D\) String
+### func \(Vector2D\) String
 
 ```go
 func (v Vector2D) String() string
@@ -248,7 +248,7 @@ func (v Vector2D) String() string
 
 Returns a string representation of the vector
 
-## func \(\*Vector2D\) Sub
+### func \(\*Vector2D\) Sub
 
 ```go
 func (v *Vector2D) Sub(v2 Vector2D) error
@@ -256,7 +256,7 @@ func (v *Vector2D) Sub(v2 Vector2D) error
 
 subtract a vector from the current vector
 
-## func Sub
+### func Sub
 
 ```go
 func Sub(v1, v2 Vector2D) Vector2D
@@ -264,7 +264,7 @@ func Sub(v1, v2 Vector2D) Vector2D
 
 returns the difference of two vectors
 
-## func Unit
+### func Unit
 
 ```go
 func Unit(v Vector2D) Vector2D
